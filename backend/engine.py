@@ -166,8 +166,42 @@ class Move:
                     print("Illegal Move!! Invalid diagonal or horizontal movement layout.")
                     return False
                 
-    def check_castle_move(self,color,position,board):
-        pass
+    def check_castle_move(self, color, position, board):
+        # 1. Verify it's moving in a straight line (horizontal or vertical)
+        if position.start_row != position.end_row and position.start_col != position.end_col:
+            print("Illegal Move!! Rooks can only move in straight lines.")
+            return False
+
+        # 2. Determine the direction vectors (-1, 0, or 1)
+        # If end is greater than start, step is 1. If less, step is -1. If equal, step is 0.
+        row_step = 0 if position.start_row == position.end_row else (1 if position.end_row > position.start_row else -1)
+        col_step = 0 if position.start_col == position.end_col else (1 if position.end_col > position.start_col else -1)
+
+        # 3. Scan the squares between start and end (exclusive of start and end)
+        curr_row = position.start_row + row_step
+        curr_col = position.start_col + col_step
+
+        while curr_row != position.end_row or curr_col != position.end_col:
+            if board[curr_row][curr_col] != ".":
+                print("Illegal Move!! Path is blocked by a piece.")
+                return False
+            curr_row += row_step
+            curr_col += col_step
+
+        # 4. Check the landing square
+        target_piece = board[position.end_row][position.end_col]
+        if target_piece != ".":
+            # White rook can't take White pieces; Black rook can't take Black pieces
+            if color == "white" and target_piece.isupper():
+                print("Illegal Move!! Cannot capture your own piece.")
+                return False
+            if color == "black" and target_piece.islower():
+                print("Illegal Move!! Cannot capture your own piece.")
+                return False
+
+        return True
+        
+        
 
 
 
