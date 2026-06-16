@@ -181,18 +181,26 @@ class GameState:
 
         return True
     
-    def check_knight_move(self,color,position,board):
+    def check_knight_move(self, color, position, board):
         row_diff = abs(position.start_row - position.end_row)
         col_diff = abs(position.start_col - position.end_col)
 
-
-        if row_diff  * col_diff == 2:
-            print("Illegal move!!!")
+        # 1. If it's NOT a valid L-shape, it's illegal
+        if row_diff * col_diff != 2:
+            print("[!] Illegal Move!!! Knights must move in an L-shape.")
             return False
         
+        # 2. Check the landing square for friendly pieces
+        target_piece = board[position.end_row][position.end_col]
+        if target_piece != ".":
+            if color == "white" and target_piece.isupper():
+                print("[!] Illegal Move!!! Cannot capture your own piece.")
+                return False
+            if color == "black" and target_piece.islower():
+                print("[!] Illegal Move!!! Cannot capture your own piece.")
+                return False
         
         return True
-
     
     def check_king_move(self, color, position, board):
         row_diff = abs(position.start_row - position.end_row)
