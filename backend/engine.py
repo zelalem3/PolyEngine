@@ -70,6 +70,105 @@ class Move:
         return self.cols_to_files[col] + self.rows_to_ranks[row]
     
 
+    def check_pawn_move(self, piece, color, position, board):
+        if piece == "pawn":
+            if color == "white":
+                row_diff = position.start_row - position.end_row
+                col_diff = abs(position.start_col - position.end_col)
+
+                # 1. Prevent moving backwards or staying in place
+                if row_diff <= 0:
+                    print("Illegal Move!! Pawns can only move forward.")
+                    return False
+
+                # 2. Straight forward movement (No capturing allowed)
+                if col_diff == 0:
+                    # One-step forward
+                    if row_diff == 1:
+                        if board[position.end_row][position.end_col] != ".":
+                            print("Illegal Move!! Blocked by another piece.")
+                            return False
+                        return True
+                    
+                    # Two-step initial sprint
+                    elif row_diff == 2:
+                        if position.start_row != 6:
+                            print("Illegal Move!! Can only move 2 squares on the first move.")
+                            return False
+                        if board[position.start_row - 1][position.start_col] != "." or board[position.end_row][position.end_col] != ".":
+                            print("Illegal Move!! Path is blocked.")
+                            return False
+                        return True
+                    
+                    else:
+                        print("Illegal Move!! Pawns cannot move more than 2 squares.")
+                        return False
+
+                # 3. Diagonal Captures
+                elif col_diff == 1 and row_diff == 1:
+                    target_piece = board[position.end_row][position.end_col]
+                    if target_piece == ".":
+                        print("Illegal Move!! Pawns can only move diagonally to capture.")
+                        return False
+                    if target_piece.isupper():
+                        print("Illegal Move!! Cannot capture your own piece.")
+                        return False
+                    return True # Valid capture of a black piece
+
+                else:
+                    print("Illegal Move!! Invalid diagonal or horizontal movement layout.")
+                    return False
+
+            elif color == "black":
+                # For black, moving forward increases the row index
+                row_diff = position.end_row - position.start_row
+                col_diff = abs(position.start_col - position.end_col)
+
+                # 1. Prevent moving backwards or staying in place
+                if row_diff <= 0:
+                    print("Illegal Move!! Pawns can only move forward.")
+                    return False
+
+                # 2. Straight forward movement 
+                if col_diff == 0:
+                    # One-step forward
+                    if row_diff == 1:
+                        if board[position.end_row][position.end_col] != ".":
+                            print("Illegal Move!! Blocked by another piece.")
+                            return False
+                        return True
+                    
+                    # Two-step initial sprint
+                    elif row_diff == 2:
+                        if position.start_row != 1:
+                            print("Illegal Move!! Can only move 2 squares on the first move.")
+                            return False
+                        if board[position.start_row + 1][position.start_col] != "." or board[position.end_row][position.end_col] != ".":
+                            print("Illegal Move!! Path is blocked.")
+                            return False
+                        return True
+                    
+                    else:
+                        print("Illegal Move!! Pawns cannot move more than 2 squares.")
+                        return False
+
+                # 3. Diagonal Captures
+                elif col_diff == 1 and row_diff == 1:
+                    target_piece = board[position.end_row][position.end_col]
+                    if target_piece == ".":
+                        print("Illegal Move!! Pawns can only move diagonally to capture.")
+                        return False
+                    if target_piece.islower():
+                        print("Illegal Move!! Cannot capture your own piece.")
+                        return False
+                    return True 
+                else:
+                    print("Illegal Move!! Invalid diagonal or horizontal movement layout.")
+                    return False
+                
+    def check_castle_move(self,color,position,board):
+        pass
+
 
 
 # Interactive loop runner
