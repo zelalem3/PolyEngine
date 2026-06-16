@@ -166,7 +166,7 @@ class Move:
                     print("Illegal Move!! Invalid diagonal or horizontal movement layout.")
                     return False
                 
-    def check_castle_move(self, color, position, board):
+    def check_rook_move(self, color, position, board):
         # 1. Verify it's moving in a straight line (horizontal or vertical)
         if position.start_row != position.end_row and position.start_col != position.end_col:
             print("Illegal Move!! Rooks can only move in straight lines.")
@@ -200,8 +200,81 @@ class Move:
                 return False
 
         return True
+    
+
+    def check_bishop_move(self,color,position,board):
+        row_diff = abs(position.start_row - position.end_row)
+        col_diff = abs(position.start_col - position.end_col)
+        row_step = 1 if position.end_row > position.start_row else -1
+        col_step = 1 if position.end_col > position.start_col else -1
+        # Start checking from the first square along the diagonal path
+        curr_row = position.start_row + row_step
+        curr_col = position.start_col + col_step
+
+        if row_diff != col_diff:
+            print("Illegal Move!! Bishops can only move diagonally.")
+            return False
+        while curr_row != position.end_row and curr_col != position.end_col:
+            if board[curr_row][curr_col] != ".":
+                print("Illegal Move!! The diagonal path is blocked.")
+                return False
+            
+            # Step diagonally to the next square
+            curr_row += row_step
+            curr_col += col_step
         
+        if board[position.end_row][position.end_col].isUpper():
+            print("Illegal Move!!! can't capture your own piece")
+            return False                
+
         
+
+        return True
+    
+    def check_king_move(self, color, position, board):
+        row_diff = abs(position.start_row - position.end_row)
+        col_diff = abs(position.start_col - position.end_col)
+
+        # 1. Prevent the King from moving more than 1 square in any direction
+        if row_diff > 1 or col_diff > 1:
+            print("[!] Illegal Move!!! The King can only move one square.")
+            return False
+
+        # 2. Prevent the King from staying on the exact same square
+        if row_diff == 0 and col_diff == 0:
+            print("[!] Illegal Move!!! You must move to a different square.")
+            return False
+
+        # 3. Check the landing square for friendly pieces
+        target_piece = board[position.end_row][position.end_col]
+        if target_piece != ".":
+            if color == "white" and target_piece.isupper():
+                print("[!] Illegal Move!!! Cannot capture your own piece.")
+                return False
+            if color == "black" and target_piece.islower():
+                print("[!] Illegal Move!!! Cannot capture your own piece.")
+                return False
+
+        # 4. Prevent King Opposition (Kings cannot stand next to each other)
+        enemy_king = "k" if color == "white" else "K"
+
+        # Scan a 3x3 grid centered around the destination square
+        for dr in [-1, 0, 1]:
+            for dc in [-1, 0, 1]:
+                # Skip checking the center square itself (where our king is landing)
+                if dr == 0 and dc == 0:
+                    continue
+
+                check_row = position.end_row + dr
+                check_col = position.end_col + dc
+
+                # Ensure the boundary stays within the 8x8 grid
+                if 0 <= check_row < 8 and 0 <= check_col < 8:
+                    if board[check_row][check_col] == enemy_king:
+                        print("[!] Illegal Move!!! Kings cannot stand adjacent to each other.")
+                        return False
+
+        return True
 
 
 
