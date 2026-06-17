@@ -1,0 +1,5 @@
+stockfish-ubuntu-x86-64-avx2
+env/
+venv/
+__pycache__/
+*.exe
